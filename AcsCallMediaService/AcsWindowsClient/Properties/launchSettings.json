@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AcsWindowsClient (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "AcsWindowsClient (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
