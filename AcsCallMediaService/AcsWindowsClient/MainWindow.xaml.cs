@@ -1,3 +1,4 @@
+using Grpc.Core;
 using Grpc.Net.Client;
 using GrpcProto;
 using Microsoft.UI.Xaml;
@@ -27,13 +28,18 @@ namespace AcsWindowsClient
 
 		private async void Grpc()
 		{
-			// The port number must match the port of the gRPC server.
-			//using var channel = GrpcChannel.ForAddress("https://localhost:7228");
 			using var channel = CreateChannel();
-			var client = new Greeter.GreeterClient(channel);
-			var reply = await client.SayHelloAsync(
-							  new HelloRequest { Name = "GreeterClient" });
-			myText.Text = "Greeting: " + reply.Message;
+			//var client = new Greeter.GreeterClient(channel);
+			//var reply = await client.SayHelloAsync(
+			//				  new HelloRequest { Name = "GreeterClient" });
+			//myText.Text = "Greeting: " + reply.Message;
+
+			var client = new ServerSentCommands.ServerSentCommandsClient(channel);
+			using var stream = client.GetCommands(new GetCommandsRequest());
+			await foreach (var command in stream.ResponseStream.ReadAllAsync())
+			{
+				myText.Text = $"Command: {command.Action} ({command.Args})";
+			}
 		}
 
 		private static GrpcChannel CreateChannel()
