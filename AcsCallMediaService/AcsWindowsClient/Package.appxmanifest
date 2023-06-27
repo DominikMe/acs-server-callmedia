@@ -8,7 +8,7 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="20856a55-5950-49f7-b851-266516638cee"
+    Name="AcsWindowsClient"
     Publisher="CN=domessin"
     Version="1.0.0.0" />
 

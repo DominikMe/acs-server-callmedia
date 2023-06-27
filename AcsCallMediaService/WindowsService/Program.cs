@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using WindowsService;
 using WindowsService.Services;
 
 if (!OperatingSystem.IsWindows())
@@ -6,22 +8,29 @@ if (!OperatingSystem.IsWindows())
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-	// for better perf use named pipes instead of going over Tcp
-	serverOptions.ListenNamedPipe("GrpcPipe", listenOptions =>
-	{
-		listenOptions.Protocols = HttpProtocols.Http2;
-	});
-});
+// not sure how to use named pipes and also have TCP / HTTP endpoints
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//	// for better perf use named pipes instead of going over Tcp
+//	serverOptions.ListenNamedPipe("GrpcPipe", listenOptions =>
+//	{
+//		listenOptions.Protocols = HttpProtocols.Http2;
+//	});
+//});
 
 // Add services to the container.
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<AcsWindowsClientManager>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<CommandService>();
-app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+app.MapGet("/health", () => "Healthy");
+app.MapGet("/start", async () =>
+{
+	await app.Services.GetService<AcsWindowsClientManager>().LaunchApp();
+
+});
 
 app.Run();

@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.33711.374
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService", "WindowsService\WindowsService.csproj", "{B8F2B5E4-B336-44ED-B744-50F476207754}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsService", "WindowsService\WindowsService.csproj", "{B8F2B5E4-B336-44ED-B744-50F476207754}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AcsWindowsClient", "AcsWindowsClient\AcsWindowsClient.csproj", "{5DC854FF-2FFE-40C8-8202-3A42E27A959B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AcsWindowsClient", "AcsWindowsClient\AcsWindowsClient.csproj", "{5DC854FF-2FFE-40C8-8202-3A42E27A959B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcProto", "GrpcProto\GrpcProto.csproj", "{B59411AA-5D6F-424E-A799-5C586CD07689}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcProto", "GrpcProto\GrpcProto.csproj", "{B59411AA-5D6F-424E-A799-5C586CD07689}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MemoryMappedFiles", "MemoryMappedFiles\MemoryMappedFiles.csproj", "{40D367E5-B00D-40BD-B309-F8EACB693A6D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,22 @@ Global
 		{B59411AA-5D6F-424E-A799-5C586CD07689}.Release|x64.Build.0 = Release|Any CPU
 		{B59411AA-5D6F-424E-A799-5C586CD07689}.Release|x86.ActiveCfg = Release|Any CPU
 		{B59411AA-5D6F-424E-A799-5C586CD07689}.Release|x86.Build.0 = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|x64.Build.0 = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Debug|x86.Build.0 = Debug|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|ARM64.Build.0 = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|x64.ActiveCfg = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|x64.Build.0 = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|x86.ActiveCfg = Release|Any CPU
+		{40D367E5-B00D-40BD-B309-F8EACB693A6D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

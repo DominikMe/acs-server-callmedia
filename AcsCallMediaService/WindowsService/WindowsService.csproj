@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GrpcProto\GrpcProto.csproj" />
+    <ProjectReference Include="..\MemoryMappedFiles\MemoryMappedFiles.csproj" />
   </ItemGroup>
 
 </Project>
