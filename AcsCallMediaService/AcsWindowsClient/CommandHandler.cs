@@ -1,15 +1,23 @@
 ﻿using GrpcProto;
 using MemoryMappedFiles;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace AcsWindowsClient
 {
     internal class CommandHandler
     {
+        private readonly Action<string> log;
+        private readonly Events.EventsClient eventsClient;
         private Dictionary<string, CallHandler> callHandlers = new();
 
-        public CommandHandler() { }
+        public CommandHandler(Action<string> log, Events.EventsClient eventsClient)
+        {
+            this.log = log;
+            this.eventsClient = eventsClient;
+        }
 
         public async Task Handle(Command command)
         {
@@ -30,15 +38,24 @@ namespace AcsWindowsClient
             callHandlers[$"{displayName}@{meetingJoinUrl}"] = callHandler;
             await callHandler.Initialize();
             await callHandler.JoinTeamsMeeting(meetingJoinUrl);
+            await eventsClient.HasJoinedAsync(new HasJoinedRequest { DisplayName = displayName, MeetingJoinUrl = meetingJoinUrl });
         }
 
         private async Task SendVideoFrame(string displayName, string call, string memFile)
         {
             CallHandler callHandler = callHandlers[$"{displayName}@{call}"];
             // should we do the IO here or in VideoStreamer?
-            var bitmap = await MemFileIO.ReadBitmapFromMemoryMappedFile(memFile, new() { Width = 1280, Height = 720 }); // todo don't hardcode size here
-            callHandler.EnqueueVideoFrame(bitmap.ToMemoryBuffer());
-            // todo: delete memFile
+            var bitmap = await MemFileIO.ReadBitmapFromMemoryMappedFile(memFile, new() { Width = 1280, Height = 720 }, disposeAfter: true); // todo don't hardcode size here
+
+            if (bitmap.TestFirstPixel())
+            {
+                //log("Black frame!!!");
+                Debug.WriteLine("Black frame!!");
+            }
+            else
+            {
+                callHandler.EnqueueVideoFrame(bitmap.ToMemoryBuffer());
+            }
         }
     }
 }

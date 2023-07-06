@@ -28,3 +28,15 @@ message Command {
 message GetCommandsRequest {
 
 }
+
+service Events {
+  rpc HasJoined (HasJoinedRequest) returns (HasJoinedResponse);
+}
+
+message HasJoinedRequest {
+  string meetingJoinUrl = 1;
+  string displayName = 2;
+}
+
+message HasJoinedResponse {
+}

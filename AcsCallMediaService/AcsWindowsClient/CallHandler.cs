@@ -1,6 +1,5 @@
 ﻿using Azure.Communication.Calling.WindowsClient;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Windows.Foundation;
 
@@ -40,17 +39,22 @@ namespace AcsWindowsClient
                     Streams = new[] { videoStreamer.VideoStream }
                 }
             });
+            TaskCompletionSource taskCompletionSource = new();
             call.StateChanged += (_, __) =>
             {
                 if (call.State == CallState.Connected)
                 {
                     videoStreamer.Start();
+                    taskCompletionSource.SetResult();
                 }
                 else
                 {
                     videoStreamer.Stop();
                 }
             };
+            await call.MuteOutgoingAudioAsync();
+            await call.MuteIncomingAudioAsync();
+            await taskCompletionSource.Task;
         }
 
         public void EnqueueVideoFrame(MemoryBuffer memBuffer)

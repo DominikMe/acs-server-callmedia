@@ -13,7 +13,7 @@ namespace WindowsService
             var bmpData = bitmap.LockBits(
                 new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadWrite,
-                PixelFormat.Format32bppRgb);
+                PixelFormat.Format32bppArgb);
 
             CreateFrame(bmpData.Scan0, size, position, width);
 
@@ -21,11 +21,14 @@ namespace WindowsService
             return bitmap;
         }
 
+        private static int InvertEndianness(int value) => BitConverter.ToInt32(BitConverter.GetBytes(value).Reverse().ToArray(), 0);
+
+        // todo: blue is still showing up as red ?
+        private static int foreground = InvertEndianness(Color.White.ToArgb());
+        private static int background = InvertEndianness(Color.Blue.ToArgb());
+
         private static void CreateFrame(IntPtr destination, Size size, int position, int width)
         {
-            var foreground = Color.White.ToArgb();
-            var background = Color.Black.ToArgb();
-
             var barStart = position * 4;
             var barEnd = (position + width) * 4;
             for (var row = 0; row < size.Height; row++)

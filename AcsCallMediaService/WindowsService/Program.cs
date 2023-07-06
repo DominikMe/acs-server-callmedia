@@ -21,10 +21,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddGrpc();
 builder.Services.AddSingleton<AcsWindowsClientManager>();
+builder.Services.AddSingleton<EventsService>();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.MapGrpcService<EventsService>();
+app.MapGrpcService<ReceiverService>();
 app.MapGrpcService<CommandService>();
 app.MapGet("/health", () => "Healthy");
 app.MapGet("/start", async () =>

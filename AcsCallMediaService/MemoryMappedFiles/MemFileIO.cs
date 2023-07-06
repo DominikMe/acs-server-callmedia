@@ -8,7 +8,7 @@ namespace MemoryMappedFiles
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
     public class MemFileIO
     {
-        public static async Task<Bitmap> ReadBitmapFromMemoryMappedFile(string memFilePath, Size size)
+        public static async Task<Bitmap> ReadBitmapFromMemoryMappedFile(string memFilePath, Size size, bool disposeAfter = false)
         {
             var bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppRgb);
 
@@ -18,7 +18,7 @@ namespace MemoryMappedFiles
                 var bmpData = bitmap.LockBits(
                     new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                     ImageLockMode.ReadWrite,
-                    PixelFormat.Format32bppRgb);
+                    PixelFormat.Format32bppArgb);
 
                 using MemoryMappedViewStream stream = memFile.CreateViewStream();
                 var length = bitmap.Width * bitmap.Height * 4;
@@ -27,6 +27,10 @@ namespace MemoryMappedFiles
                 Marshal.Copy(buffer, 0, bmpData.Scan0, length);
 
                 bitmap.UnlockBits(bmpData);
+                if (disposeAfter)
+                {
+                    //memFile.Dispose();
+                }
             }
             catch (FileNotFoundException)
             {
@@ -43,7 +47,7 @@ namespace MemoryMappedFiles
             var bmpData = bitmap.LockBits(
                 new Rectangle(0, 0, bitmap.Width, bitmap.Height),
                 ImageLockMode.ReadOnly,
-                PixelFormat.Format32bppRgb);
+                PixelFormat.Format32bppArgb);
 
             var length = bitmap.Width * bitmap.Height * 4;
             byte[] buffer = new byte[length];
