@@ -11,5 +11,6 @@
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
         <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
         <TextBlock x:Name="myText"></TextBlock>
+        <Image x:Name="myImage" Width="800" Height="600"></Image>
     </StackPanel>
 </Window>

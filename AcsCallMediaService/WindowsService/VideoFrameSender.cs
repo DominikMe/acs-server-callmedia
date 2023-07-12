@@ -24,34 +24,36 @@ namespace WindowsService
             if (isRunning) return;
 
             isRunning = true;
-            int position = 0;
             Size size = new() { Width = 1280, Height = 720 };
             int fps = 30;
-            while (isRunning)
-            {
-                await SendFrame(position, size);
-                position = (position + 1) % size.Width;
-                await Task.Delay(1000 / fps);
-            }
-            
-            async ValueTask SendFrame(int position, Size size)
-            {
-                try
-                {
-                    Bitmap bitmap = TestFrameGenerator.CreateFrame(size, position, 20);
-                    string memFile = $"v{DateTimeOffset.UtcNow.Ticks}";
-                    await MemFileIO.WriteBitmapToMemoryMappedFile(bitmap, memFile);
-                    Command command = new() { Action = "SendVideoFrame" };
-                    command.Args.AddRange(new[] { displayName, meetingJoinUrl, memFile });
 
-                    await commandService.Commands.Writer.WriteAsync(command);
-                }
-                catch (Exception ex)
+            RtspInput.RtspInput rtsp = new("http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg", size, fps, SendFrame);
+            await rtsp.Start();
+
+            //alternatively, use:
+            //await SendTestFrames();
+
+            async ValueTask SendTestFrames()
+            {
+                int position = 0;
+                while (isRunning)
                 {
-                    Console.WriteLine(ex.ToString());
+                    await SendFrame(TestFrameGenerator.CreateFrame(size, position, 20));
+                    position = (position + 1) % size.Width;
+                    await Task.Delay(1000 / fps);
                 }
+            }
+
+            async ValueTask SendFrame(Bitmap bitmap)
+            {
+                string memFile = $"v{DateTimeOffset.UtcNow.Ticks}";
+                await MemFileIO.WriteBitmapToMemoryMappedFile(bitmap, memFile);
+                Command command = new() { Action = "SendVideoFrame" };
+                command.Args.AddRange(new[] { displayName, meetingJoinUrl, memFile });
+
+                await commandService.Commands.Writer.WriteAsync(command);
+            }
         }
-    }
 
         public void Stop()
         {

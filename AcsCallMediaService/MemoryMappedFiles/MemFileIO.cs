@@ -17,7 +17,7 @@ namespace MemoryMappedFiles
                 var memFile = MemoryMappedFile.OpenExisting(memFilePath);
                 var bmpData = bitmap.LockBits(
                     new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                    ImageLockMode.ReadWrite,
+                    ImageLockMode.WriteOnly,
                     PixelFormat.Format32bppArgb);
 
                 using MemoryMappedViewStream stream = memFile.CreateViewStream();

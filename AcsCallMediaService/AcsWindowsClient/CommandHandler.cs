@@ -3,6 +3,7 @@ using MemoryMappedFiles;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading.Tasks;
 
 namespace AcsWindowsClient
@@ -11,12 +12,14 @@ namespace AcsWindowsClient
     {
         private readonly Action<string> log;
         private readonly Events.EventsClient eventsClient;
+        private readonly Action<Bitmap> onBitmapReceived;
         private Dictionary<string, CallHandler> callHandlers = new();
 
-        public CommandHandler(Action<string> log, Events.EventsClient eventsClient)
+        public CommandHandler(Action<string> log, Events.EventsClient eventsClient, Action<Bitmap> onBitmapReceived)
         {
             this.log = log;
             this.eventsClient = eventsClient;
+            this.onBitmapReceived = onBitmapReceived;
         }
 
         public async Task Handle(Command command)
@@ -54,6 +57,7 @@ namespace AcsWindowsClient
             }
             else
             {
+                onBitmapReceived(bitmap);
                 callHandler.EnqueueVideoFrame(bitmap.ToMemoryBuffer());
             }
         }

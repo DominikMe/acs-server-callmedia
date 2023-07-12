@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GrpcProto\GrpcProto.csproj" />
     <ProjectReference Include="..\MemoryMappedFiles\MemoryMappedFiles.csproj" />
+    <ProjectReference Include="..\RtspInput\RtspInput.csproj" />
   </ItemGroup>
 
 </Project>
