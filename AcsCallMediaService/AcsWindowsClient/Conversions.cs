@@ -44,9 +44,16 @@ namespace AcsWindowsClient
                 for (var col = 0; col < bmpData.Stride; col += 4)
                 {
                     var value = Marshal.ReadInt32(bmpData.Scan0, rowStart + col);
-                    Marshal.WriteInt32(destination, rowStart + col, value);
+                    Marshal.WriteInt32(destination, rowStart + col, ArgbToRgba((uint)value));
                 }
             }
         }
+
+        // actually needs to be abgr to match what ACS calling expects for Rgba
+        private static int ArgbToRgba(uint argb)
+            => (int)(
+                (argb & 0xff00ff00) |
+                ((argb & 0x00ff0000) >> 16) |
+                ((argb & 0x000000ff) << 16));
     }
 }

@@ -21,11 +21,8 @@ namespace WindowsService
             return bitmap;
         }
 
-        private static int InvertEndianness(int value) => BitConverter.ToInt32(BitConverter.GetBytes(value).Reverse().ToArray(), 0);
-
-        // todo: blue is still showing up as red ?
-        private static int foreground = InvertEndianness(Color.White.ToArgb());
-        private static int background = InvertEndianness(Color.Blue.ToArgb());
+        private static int foreground = Color.White.ToArgb();
+        private static int background = Color.Blue.ToArgb();
 
         private static void CreateFrame(IntPtr destination, Size size, int position, int width)
         {
