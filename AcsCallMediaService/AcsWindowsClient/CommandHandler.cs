@@ -24,31 +24,33 @@ namespace AcsWindowsClient
 
         public async Task Handle(Command command)
         {
-            switch (command.Action)
+            switch (command.CommandCase)
             {
-                case "JoinTeamsMeeting":
-                    await JoinTeamsMeeting(command.Args[0], command.Args[1], command.Args[2]);
+                case Command.CommandOneofCase.JoinTeamsMeeting:
+                    await JoinTeamsMeeting(command.JoinTeamsMeeting);
                     break;
-                case "SendVideoFrame":
-                    await SendVideoFrame(command.Args[0], command.Args[1], command.Args[2]);
+                case Command.CommandOneofCase.SendVideoFrame:
+                    await SendVideoFrame(command.SendVideoFrame);
                     break;
             }
         }
 
-        private async Task JoinTeamsMeeting(string token, string displayName, string meetingJoinUrl)
+        private async Task JoinTeamsMeeting(JoinTeamsMeeting joinCommand)
         {
-            CallHandler callHandler = new(token, displayName);
+            string displayName = joinCommand.DisplayName;
+            string meetingJoinUrl = joinCommand.MeetingJoinUrl;
+            CallHandler callHandler = new(joinCommand.CallToken, displayName);
             callHandlers[$"{displayName}@{meetingJoinUrl}"] = callHandler;
             await callHandler.Initialize();
             await callHandler.JoinTeamsMeeting(meetingJoinUrl);
             await eventsClient.HasJoinedAsync(new HasJoinedRequest { DisplayName = displayName, MeetingJoinUrl = meetingJoinUrl });
         }
 
-        private async Task SendVideoFrame(string displayName, string call, string memFile)
+        private async Task SendVideoFrame(SendVideoFrame sendVideoCommand)
         {
-            CallHandler callHandler = callHandlers[$"{displayName}@{call}"];
+            CallHandler callHandler = callHandlers[$"{sendVideoCommand.DisplayName}@{sendVideoCommand.CallLocator}"];
             // should we do the IO here or in VideoStreamer?
-            var bitmap = await MemFileIO.ReadBitmapFromMemoryMappedFile(memFile, new() { Width = 1280, Height = 720 }, disposeAfter: true); // todo don't hardcode size here
+            var bitmap = await MemFileIO.ReadBitmapFromMemoryMappedFile(sendVideoCommand.MemoryMappedFileName, new() { Width = 1280, Height = 720 }, disposeAfter: true); // todo don't hardcode size here
 
             if (bitmap.TestFirstPixel())
             {

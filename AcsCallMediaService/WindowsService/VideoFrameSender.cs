@@ -1,22 +1,26 @@
 ﻿using GrpcProto;
 using MemoryMappedFiles;
 using System.Drawing;
-using WindowsService.Services;
+using System.Threading.Channels;
 
 namespace WindowsService
 {
     public class VideoFrameSender
     {
-        private readonly CommandService commandService;
+        private readonly ChannelWriter<Command> commandWriter;
         private readonly string displayName;
         private readonly string meetingJoinUrl;
+        private readonly string? testVideoStream;
+        private readonly string channelId;
         private volatile bool isRunning;
 
-        public VideoFrameSender(CommandService commandService, string displayName, string meetingJoinUrl)
+        public VideoFrameSender(ChannelWriter<Command> commandWriter, string displayName, string meetingJoinUrl, string? testVideoStream)
         {
-            this.commandService = commandService;
+            this.commandWriter = commandWriter;
             this.displayName = displayName;
             this.meetingJoinUrl = meetingJoinUrl;
+            this.testVideoStream = testVideoStream;
+            channelId = Guid.NewGuid().ToString();
         }
 
         public async Task Start()
@@ -27,11 +31,15 @@ namespace WindowsService
             Size size = new() { Width = 1280, Height = 720 };
             int fps = 30;
 
-            RtspInput.RtspInput rtsp = new("http://pendelcam.kip.uni-heidelberg.de/mjpg/video.mjpg", size, fps, SendFrame);
-            await rtsp.Start();
-
-            //alternatively, use:
-            //await SendTestFrames();
+            if (testVideoStream is null)
+            {
+                await SendTestFrames();
+            }
+            else
+            {
+                RtspInput.RtspInput rtsp = new(testVideoStream, size, fps, SendFrame);
+                await rtsp.Start();
+            }
 
             async ValueTask SendTestFrames()
             {
@@ -46,12 +54,20 @@ namespace WindowsService
 
             async ValueTask SendFrame(Bitmap bitmap)
             {
-                string memFile = $"v{DateTimeOffset.UtcNow.Ticks}";
+                string memFile = $"{channelId}_v{DateTimeOffset.UtcNow.Ticks}";
                 await MemFileIO.WriteBitmapToMemoryMappedFile(bitmap, memFile);
-                Command command = new() { Action = "SendVideoFrame" };
-                command.Args.AddRange(new[] { displayName, meetingJoinUrl, memFile });
 
-                await commandService.Commands.Writer.WriteAsync(command);
+                Command command = new()
+                {
+                    SendVideoFrame = new()
+                    {
+                        DisplayName = displayName,
+                        CallLocator = meetingJoinUrl,
+                        MemoryMappedFileName = memFile
+                    }
+                };
+
+                await commandWriter.WriteAsync(command);
             }
         }
 

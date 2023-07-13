@@ -21,8 +21,22 @@ service ServerSentCommands {
 }
 
 message Command {
-  string action = 1;
-  repeated string args = 2;
+  oneof command {
+	  JoinTeamsMeeting joinTeamsMeeting = 1;
+	  SendVideoFrame SendVideoFrame = 2;
+  }
+}
+
+message JoinTeamsMeeting {
+	string callToken = 1;
+	string displayName = 2;
+	string meetingJoinUrl = 3;
+}
+
+message SendVideoFrame {
+	string displayName = 1;
+	string callLocator = 2;
+	string memoryMappedFileName = 3;
 }
 
 message GetCommandsRequest {

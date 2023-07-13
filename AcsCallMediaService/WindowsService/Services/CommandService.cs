@@ -6,16 +6,16 @@ namespace WindowsService.Services
 {
     public class CommandService : ServerSentCommands.ServerSentCommandsBase
 	{
-		private string callToken = "";
-		private string displayName = "VideoBridge";
-		private string meetingJoinUrl = "";
+		private const string displayName = "VideoBridge";
         private readonly EventsService eventsService;
+        private readonly IConfiguration configuration;
 
         public Channel<Command> Commands { get; private set; } = Channel.CreateBounded<Command>(new BoundedChannelOptions(capacity: 1));
 
-        public CommandService(EventsService eventsService)
+        public CommandService(EventsService eventsService, IConfiguration configuration)
 		{
             this.eventsService = eventsService;
+            this.configuration = configuration;
         }
 		
 		public override async Task GetCommands(
@@ -32,14 +32,22 @@ namespace WindowsService.Services
 				}
 			});
 
-			Command joinCommand = new() { Action = "JoinTeamsMeeting" };
-			joinCommand.Args.AddRange(new[] { callToken, displayName, meetingJoinUrl });
+			string meetingJoinUrl = configuration["TestMeetingJoinUrl"]!;
+
+            Command joinCommand = new()
+			{
+				JoinTeamsMeeting = new()
+				{
+					CallToken = configuration["AcsToken"],
+					DisplayName = displayName,
+					MeetingJoinUrl = meetingJoinUrl
+                }
+			};
 
 			await Commands.Writer.WriteAsync(joinCommand);
-			// actually need to wait until connected, not just 5sec
 			await eventsService.WaitUntilHasJoined(meetingJoinUrl, displayName);
 
-			await new VideoFrameSender(this, displayName, meetingJoinUrl).Start();
+			await new VideoFrameSender(Commands.Writer, displayName, meetingJoinUrl, configuration["TestVideoStream"]).Start();
 		}
 	}
 }
