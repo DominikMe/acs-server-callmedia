@@ -3,11 +3,9 @@ using Grpc.Net.Client;
 using GrpcProto;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media.Imaging;
-using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -27,6 +25,7 @@ namespace AcsWindowsClient
         public MainWindow()
 		{
 			this.InitializeComponent();
+			Activated += (_, __) => MinimizeWindow();
 			channel = GrpcChannel.ForAddress("https://localhost:7228"); //createChannel
 			commandHandler = new CommandHandler((msg) => myText.Text = msg, new Events.EventsClient(channel), SetImage);
 			_ = ListenToGrpcCommands();
@@ -41,7 +40,7 @@ namespace AcsWindowsClient
 
 		private async void myButton_Click(object sender, RoutedEventArgs e)
 		{
-			myButton.Content = "Clicked";
+			MinimizeWindow();
 			//Grpc();
 			//SetImage(await GetTestBitmap());
 		}
@@ -88,6 +87,12 @@ namespace AcsWindowsClient
 			var stream = ms.AsRandomAccessStream();
             image.SetSource(stream);
 			return image;
+        }
+
+		private void MinimizeWindow()
+        {
+            var windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            PInvoke.User32.ShowWindow(windowHandle, PInvoke.User32.WindowShowStyle.SW_MINIMIZE);
         }
     }
 }

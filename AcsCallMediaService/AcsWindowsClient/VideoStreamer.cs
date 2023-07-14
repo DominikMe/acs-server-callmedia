@@ -37,7 +37,6 @@ namespace AcsWindowsClient
             async Task Send()
             {
                 Stopwatch sw = new();
-                //RawVideoFrameBuffer lastFrame = null;
                 while (IsRunning)
                 {
                     sw.Restart();
@@ -50,13 +49,7 @@ namespace AcsWindowsClient
                             Buffers = new[] { memoryBuffer }
                         };
                         await SendFrameAsync(frame);
-                        //lastFrame = frame;
                     }
-                    //else if (lastFrame != null)
-                    //{
-                    //    Console.WriteLine("No frame, sending last one again");
-                    //    await SendFrameAsync(lastFrame);
-                    //}
                     var delay = (int)(1000 / VideoStream.Format.FramesPerSecond) - (int)sw.ElapsedMilliseconds;
                     if (delay > 2)
                         await Task.Delay(delay);
